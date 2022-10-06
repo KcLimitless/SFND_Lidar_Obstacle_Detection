@@ -47,7 +47,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer, ProcessPointCloud
   //renderPointCloud(viewer,inputCloud,"inputCloud");
 
   // Experiment with the ? values and find what works best
-  inputCloud = pointProcessorI->FilterCloud(inputCloud, 0.3, Eigen::Vector4f (-10, -5, -2, 1), Eigen::Vector4f ( 30, 8, 1, 1));
+  inputCloud = pointProcessorI->FilterCloud(inputCloud, 0.3, Eigen::Vector4f (-10, -5, -2, 1), Eigen::Vector4f ( 30, 7, 1, 1));
   std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessorI->SegmentPlane(inputCloud, 25, 0.3);
 
   std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first, 0.53, 10, 500);
@@ -66,6 +66,9 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer, ProcessPointCloud
 
       Box box = pointProcessorI->BoundingBox(cluster);
       renderBox(viewer,box,clusterId);
+
+      //BoxQ box = pointProcessorI->BoundingBox(cluster);
+      //renderBox(viewer,box,clusterId);
       
       ++clusterId;
     }
@@ -97,7 +100,7 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     ProcessPointClouds<pcl::PointXYZ> pointProcessor; //on the stack
     //ProcessPointClouds<pcl::PointXYZ>* pointProcessor = new ProcessPointClouds<pcl::PointXYZ>(); //on the heap
 
-    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessor.SegmentPlane(inputCloud, 120, 0.2);
+    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessor.RansacPlane(inputCloud, 100, 0.2);
 
     //renderPointCloud(viewer, segmentCloud.first, "planeCloud", Color(0,1,0));
     //renderPointCloud(viewer, segmentCloud.second, "obstCloud", Color(1,0,0));
@@ -113,11 +116,9 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
       pointProcessor.numPoints(cluster);
       renderPointCloud(viewer,cluster,"obstCloud"+std::to_string(clusterId),colors[clusterId]);
       
-      //Box box = pointProcessor.BoundingBox(cluster);
-      //renderBox(viewer,box,clusterId);
-
       Box box = pointProcessor.BoundingBox(cluster);
       renderBox(viewer,box,clusterId);
+
       
       ++clusterId;
     }
@@ -157,7 +158,7 @@ int main (int argc, char** argv)
     std::cout << "starting enviroment" << std::endl;
 
     pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
-    CameraAngle setAngle = XY;
+    CameraAngle setAngle = FPS;
     initCamera(setAngle, viewer);
     //simpleHighway(viewer);
 

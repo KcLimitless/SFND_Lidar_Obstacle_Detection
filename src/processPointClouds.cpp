@@ -2,6 +2,7 @@
 
 #include "processPointClouds.h"
 #include <unordered_set>
+#include <pcl/common/transforms.h>
 
 
 //constructor:
@@ -194,7 +195,8 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
         if(inliers.count(index)>0)
           continue;
         
-        pcl::PointXYZ point = cloud->points[index];
+        //pcl::PointXYZ point = cloud->points[index];
+        PointT point = cloud->points[index];
         float x4 = point.x;
         float y4 = point.y;
         float z4 = point.z;
@@ -204,7 +206,7 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
         if(dist <= distanceTol)
           inliers.insert(index);
         
-       }
+      }
       
       if(inliers.size() > inliersResult.size())
         inliersResult = inliers;
@@ -212,11 +214,12 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     }
   
     pcl::PointCloud<pcl::PointXYZ>::Ptr  cloudInliers(new pcl::PointCloud<pcl::PointXYZ>());
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
+	  pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
 
 	for(int index = 0; index < cloud->points.size(); index++)
 	{
-		pcl::PointXYZ point = cloud->points[index];
+		//pcl::PointXYZ point = cloud->points[index];
+    PointT point = cloud->points[index];
 		if(inliersResult.count(index))
 			cloudInliers->points.push_back(point);
 		else
@@ -296,6 +299,50 @@ Box ProcessPointClouds<PointT>::BoundingBox(typename pcl::PointCloud<PointT>::Pt
 
     return box;
 }
+
+/*
+template<typename PointT>
+BoxQ ProcessPointClouds<PointT>::BoundingBox(typename pcl::PointCloud<PointT>::Ptr cluster)
+{
+
+    // Find bounding box for one of the clusters
+    // Compute principal directions
+    Eigen::Vector4f pcaCentroid;
+    pcl::compute3DCentroid(*cluster, pcaCentroid);
+    Eigen::Matrix3f covariance;
+    computeCovarianceMatrixNormalized(*cluster, pcaCentroid, covariance);
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3f> eigen_solver(covariance, Eigen::ComputeEigenvectors);
+    Eigen::Matrix3f eigenVectorsPCA = eigen_solver.eigenvectors();
+    eigenVectorsPCA.col(2) = eigenVectorsPCA.col(0).cross(eigenVectorsPCA.col(1));  /// This line is necessary for proper orientation in some cases. The numbers come out the same without it, but
+                                                                                ///    the signs are different and the box doesn't get correctly oriented in some cases.
+
+
+    // Transform the original cloud to the origin where the principal components correspond to the axes.
+    Eigen::Matrix4f projectionTransform(Eigen::Matrix4f::Identity());
+    projectionTransform.block<3,3>(0,0) = eigenVectorsPCA.transpose();
+    projectionTransform.block<3,1>(0,3) = -1.f * (projectionTransform.block<3,3>(0,0) * pcaCentroid.head<3>());
+    typename pcl::PointCloud<PointT>::Ptr cloudPointsProjected (new pcl::PointCloud<PointT>);
+    pcl::transformPointCloud(*cluster, *cloudPointsProjected, projectionTransform);
+
+    // Get the minimum and maximum points of the transformed cloud.
+    PointT minPoint, maxPoint;
+    pcl::getMinMax3D(*cloudPointsProjected, minPoint, maxPoint);
+    const Eigen::Vector3f meanDiagonal = 0.5f*(maxPoint.getVector3fMap() + minPoint.getVector3fMap());
+
+    // Final transform
+    const Eigen::Quaternionf bboxQuaternion(eigenVectorsPCA); //Quaternions are a way to do rotations https://www.youtube.com/watch?v=mHVwd8gYLnI
+    const Eigen::Vector3f bboxTransform = eigenVectorsPCA * meanDiagonal + pcaCentroid.head<3>();
+
+    BoxQ box;
+
+    box.bboxTransform = bboxTransform;
+    box.bboxQuaternion = bboxQuaternion;
+    box.cube_length = maxPoint.x - minPoint.x;
+    box.cube_width = maxPoint.y - minPoint.y;
+    box.cube_height = maxPoint.z - minPoint.z;
+
+    return box;
+} */
 
 
 template<typename PointT>
