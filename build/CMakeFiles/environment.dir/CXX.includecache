@@ -7,6 +7,8 @@
 #IncludeRegexTransform: 
 
 /home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/environment.cpp
+cmath
+-
 sensors/lidar.h
 /home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/sensors/lidar.h
 render/render.h
@@ -15,6 +17,8 @@ processPointClouds.h
 /home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/processPointClouds.h
 processPointClouds.cpp
 /home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/processPointClouds.cpp
+quiz/cluster/kdtree.h
+/home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/quiz/cluster/kdtree.h
 
 /home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/processPointClouds.cpp
 processPointClouds.h
@@ -55,6 +59,10 @@ chrono
 -
 render/box.h
 /home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/render/box.h
+
+/home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/quiz/cluster/kdtree.h
+../../render/render.h
+/home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/render/render.h
 
 /home/kcubuntu/Desktop/Udacity/SFND_Lidar_Obstacle_Detection/src/render/box.h
 Eigen/Geometry
