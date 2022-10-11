@@ -55,9 +55,9 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> euclideanCluster(const std::v
       
     //std::vector<int> cluster;
     typename pcl::PointCloud<PointT>::Ptr cluster (new pcl::PointCloud<PointT>);
-    clusterHelper(i, points, cluster, processed, tree, distanceTol);
+    clusterHelper<pcl::PointXYZI>(i, points, cluster, processed, tree, distanceTol);
 
-    if(cluster->points.size() >= minSize && cluster->points.size() >=maxSize)
+    if(cluster->points.size() >= minSize && cluster->points.size() <=maxSize)
     {
       clusters.push_back(cluster);
       i++;
@@ -139,7 +139,8 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer, ProcessPointCloud
   for(int i=0; i<points.size(); i++)
     tree->insert(points[i], i);
 
-  std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = euclideanCluster(points, tree, 0.4, 10, 500);
+  //std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = euclideanCluster<pcl::PointXYZI>(points, tree, 0.4, 10, 500);
+  auto cloudClusters = euclideanCluster<pcl::PointXYZI>(points, tree, 0.4, 10, 500);
 
   int clusterId = 0;
   std::vector<Color> colors = {Color(1,0,0), Color(1,1,0), Color(0,0,1)};
