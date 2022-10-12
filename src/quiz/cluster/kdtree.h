@@ -43,19 +43,16 @@ void insertHelper(Node** node, uint depth, std::vector<float> point, int id)
     
 }
 
-void searchHelper(std::vector<float> target, Node* node, int depth, float distanceTol, std::vector<int> &ids)
+void searchHelper(pcl::PointXYZI target, Node* node, int depth, float distanceTol, std::vector<int> &ids)
 {
-    
-  if(node == NULL)
-    return;
-
+  
   if(node!=NULL)
   {
-    if( (node->point[0]>=(target[0]-distanceTol)&&node->point[0]<=(target[0]+distanceTol)) 
-    && (node->point[1]>=(target[1]-distanceTol)&&node->point[1]<=(target[1]+distanceTol)) 
-    && (node->point[2]>=(target[2]-distanceTol)&&node->point[2]<=(target[2]+distanceTol)) )
+    if( (node->point[0]>=(target.x-distanceTol)&&node->point[0]<=(target.x+distanceTol)) 
+    && (node->point[1]>=(target.y-distanceTol)&&node->point[1]<=(target.y+distanceTol)) 
+    && (node->point[2]>=(target.z-distanceTol)&&node->point[2]<=(target.z+distanceTol)) )
     {
-      float distance = sqrt(pow(node->point[0]-target[0], 2) + pow(node->point[1]-target[1], 2) + pow(node->point[2]-target[2], 2));
+      float distance = sqrt(pow(node->point[0]-target.x, 2) + pow(node->point[1]-target.y, 2) + pow(node->point[2]-target.z, 2));
          
       if(distance<=distanceTol)
       {
@@ -64,22 +61,22 @@ void searchHelper(std::vector<float> target, Node* node, int depth, float distan
              
     }
 
-    // Check accross boundary
+    /* // Check accross boundary
     uint cd = depth % 3;
-    if(abs(node->point[cd] - target[cd]) > distanceTol)
+    if(abs(node->point[cd] - target) > distanceTol)
     {
-      if(node->point[cd] >= target[cd])
+      if(node->point[cd] >= target)
         searchHelper(target, node->left, depth+1, distanceTol, ids);
       else
         searchHelper(target, node->right, depth+1, distanceTol, ids);
-    }    
+    } */   
       
     // Check accross boundary
-    //uint cd = depth % 3;
-    //if((target[cd]-distanceTol)<node->point[cd])
-    //   searchHelper(target, node->left, depth+1, distanceTol, ids);
-    //if((target[cd]+distanceTol)>node->point[cd])
-    //   searchHelper(target, node->right, depth+1, distanceTol, ids);
+    uint cd = depth % 3;
+    if(((target)[cd]-distanceTol)<node->point[cd])
+       searchHelper(target, node->left, depth+1, distanceTol, ids);
+    if(((target)[cd]+distanceTol)>node->point[cd])
+       searchHelper(target, node->right, depth+1, distanceTol, ids);
   }
     
 }
@@ -106,6 +103,16 @@ struct KdTree
 
 	}
 
+  // return a list of point ids in the tree that are within distance of target
+	std::vector<int> search(pcl::PointXYZI target, float distanceTol)
+	{
+		std::vector<int> ids;
+    searchHelper(target, root, 0, distanceTol, ids);
+
+		return ids;
+	}
+
+  /*
 	// return a list of point ids in the tree that are within distance of target
 	std::vector<int> search(std::vector<float> target, float distanceTol)
 	{
@@ -113,7 +120,7 @@ struct KdTree
     searchHelper(target, root, 0, distanceTol, ids);
 
 		return ids;
-	}
+	}*/
 	
 
 };
