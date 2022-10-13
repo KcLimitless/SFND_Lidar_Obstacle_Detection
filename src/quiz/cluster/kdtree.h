@@ -61,22 +61,17 @@ void searchHelper(pcl::PointXYZI target, Node* node, int depth, float distanceTo
              
     }
 
-    /* // Check accross boundary
-    uint cd = depth % 3;
-    if(abs(node->point[cd] - target) > distanceTol)
-    {
-      if(node->point[cd] >= target)
-        searchHelper(target, node->left, depth+1, distanceTol, ids);
-      else
-        searchHelper(target, node->right, depth+1, distanceTol, ids);
-    } */   
-      
+    searchHelper(target, node->left, depth+1, distanceTol, ids);
+    searchHelper(target, node->right, depth+1, distanceTol, ids);
+
+    /*   
     // Check accross boundary
     uint cd = depth % 3;
     if(((target)[cd]-distanceTol)<node->point[cd])
        searchHelper(target, node->left, depth+1, distanceTol, ids);
     if(((target)[cd]+distanceTol)>node->point[cd])
        searchHelper(target, node->right, depth+1, distanceTol, ids);
+    */   
   }
     
 }
@@ -112,16 +107,6 @@ struct KdTree
 		return ids;
 	}
 
-  /*
-	// return a list of point ids in the tree that are within distance of target
-	std::vector<int> search(std::vector<float> target, float distanceTol)
-	{
-		std::vector<int> ids;
-    searchHelper(target, root, 0, distanceTol, ids);
-
-		return ids;
-	}*/
-	
 
 };
 
